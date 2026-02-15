@@ -30,7 +30,7 @@ body {
     overflow: hidden;
     background-image: radial-gradient(circle at 20% 30%, rgba(124, 58, 237, 0.12) 0%, transparent 40%),
                       radial-gradient(circle at 80% 70%, rgba(59, 130, 246, 0.12) 0%, transparent 40%);
-    /* Auto 80% Scale Applied Here */
+    /* Global scale to keep elements from bleeding off screen */
     zoom: 0.8;
     -moz-transform: scale(0.8);
     -moz-transform-origin: center center;
@@ -40,11 +40,12 @@ body {
     width: 96vw;
     height: 92vh;
     display: grid;
-    grid-template-columns: 1fr 550px;
-    gap: 35px;
+    /* 3/4 Left (3fr) and 1/4 Right (1fr) */
+    grid-template-columns: 3fr 1fr;
+    gap: 25px;
 }
 
-/* --- LIQUID GLASS CARD WITH DUAL LONG OUTLINES --- */
+/* --- LIQUID GLASS CARD --- */
 .glass-card {
     background: var(--glass-bg);
     backdrop-filter: blur(40px);
@@ -56,7 +57,6 @@ body {
     box-shadow: 0 30px 60px rgba(0,0,0,0.6);
 }
 
-/* Primary Top-Left Outline (Longer Fade) */
 .glass-card::before {
     content: '';
     position: absolute;
@@ -71,7 +71,6 @@ body {
     z-index: 2;
 }
 
-/* Secondary Bottom-Right Outline (80% Opacity, Longer Fade) */
 .glass-card::after {
     content: '';
     position: absolute;
@@ -86,17 +85,31 @@ body {
     z-index: 1;
 }
 
-/* --- CLOCK (REFINED STANDBY FADE) --- */
+/* --- LEFT SECTION LAYOUT --- */
+.left-section { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 25px; 
+    height: 100%; 
+}
+
+.widgets-row { 
+    display: flex; 
+    gap: 25px; 
+    height: 220px; /* Reduced height to keep scale tight */
+}
+
+/* --- CLOCK --- */
 .clock-widget {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 80px;
+    padding: 60px;
 }
 
 .time-display {
-    font-size: 13vw;
+    font-size: 11vw; /* Scaled down for 3/4 layout */
     font-weight: 800;
     letter-spacing: -6px;
     line-height: 0.9;
@@ -107,64 +120,64 @@ body {
 }
 
 .date-display {
-    font-size: 2.2vw;
+    font-size: 1.8vw;
     color: var(--text-secondary);
-    margin-top: 20px;
+    margin-top: 15px;
     font-weight: 600;
     letter-spacing: 1px;
 }
 
-/* --- PROFILE & ACTIVITY SCALING --- */
-.left-section { display: flex; flex-direction: column; gap: 35px; height: 100%; }
-.widgets-row { display: flex; gap: 35px; height: 260px; }
-
-.profile-widget, .activity-widget { flex: 1; padding: 45px; display: flex; align-items: center; gap: 35px; }
+/* --- PROFILE & ACTIVITY --- */
+.profile-widget, .activity-widget { 
+    flex: 1; 
+    padding: 35px; 
+    display: flex; 
+    align-items: center; 
+    gap: 25px; 
+}
 
 .avatar {
-    width: 130px; height: 130px; border-radius: 50%;
+    width: 100px; height: 100px; border-radius: 50%;
     background-size: cover; position: relative;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     z-index: 5;
 }
 
 .status-dot {
-    width: 28px; height: 28px; border-radius: 50%;
-    position: absolute; bottom: 8px; right: 8px;
-    border: 5px solid #1a1a1a;
+    width: 22px; height: 22px; border-radius: 50%;
+    position: absolute; bottom: 4px; right: 4px;
+    border: 4px solid #1a1a1a;
 }
 
-.display-name { font-size: 42px; font-weight: 800; margin-bottom: 5px; background: linear-gradient(to right,#2aaea6,#ffc490); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-.username { font-size: 22px; opacity: 0.5; font-weight: 600; }
-.custom-status { font-size: 22px; margin-top: 10px; display: flex; align-items: center; gap: 10px; color: #eee; font-weight: 400; }
-.custom-status img { width: 28px; height: 28px; }
+.display-name { font-size: 32px; font-weight: 800; margin-bottom: 2px; background: linear-gradient(to right,#2aaea6,#ffc490); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.username { font-size: 18px; opacity: 0.5; font-weight: 600; }
+.custom-status { font-size: 18px; margin-top: 8px; display: flex; align-items: center; gap: 10px; color: #eee; }
+.custom-status img { width: 22px; height: 22px; }
 
-.activity-label { opacity: 0.4; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; font-weight: 800; }
-.activity-title { font-size: 32px; font-weight: 800; line-height: 1.2; }
-.activity-timer { font-size: 26px; color: var(--accent); margin-top: 10px; font-weight: 600; font-family: monospace; }
+.activity-label { opacity: 0.4; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; font-weight: 800; }
+.activity-title { font-size: 26px; font-weight: 800; line-height: 1.2; }
+.activity-timer { font-size: 22px; color: var(--accent); margin-top: 8px; font-weight: 600; font-family: monospace; }
 
-/* --- MUSIC --- */
-.music-section { padding: 30px; display: flex; flex-direction: column; }
+/* --- MUSIC (RIGHT 1/4) --- */
+.music-section { padding: 20px; display: flex; flex-direction: column; }
 #playlist-selector {
     position: absolute; inset: 0; background: rgba(0,0,0,0.98);
-    z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 25px; padding: 50px;
+    z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 15px; padding: 30px;
 }
 .playlist-btn {
     background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);
-    padding: 25px; border-radius: 30px; color: white; width: 100%; cursor: pointer; font-size: 22px; font-weight: 700; transition: 0.3s;
+    padding: 20px; border-radius: 20px; color: white; width: 100%; cursor: pointer; font-size: 18px; font-weight: 700; transition: 0.3s;
 }
-.playlist-btn:hover { background: white; color: black; transform: scale(1.02); }
 
-.video-container { flex: 1; border-radius: 30px; overflow: hidden; background: #000; box-shadow: inset 0 0 50px rgba(0,0,0,1); position: relative; z-index: 3; }
-.controls-container { height: 180px; margin-top: 25px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 25px; z-index: 3; }
-.track-title { font-size: 22px; font-weight: 600; text-align: center; width: 95%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.9; }
+.video-container { flex: 1; border-radius: 25px; overflow: hidden; background: #000; position: relative; z-index: 3; }
+.controls-container { height: 140px; margin-top: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; z-index: 3; }
+.track-title { font-size: 16px; font-weight: 600; text-align: center; width: 90%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.8; }
 
-.buttons-row { display: flex; align-items: center; gap: 40px; }
-.ctrl-btn svg { width: 40px; height: 40px; fill: white; opacity: 0.7; cursor: pointer; transition: 0.2s; }
-.ctrl-btn:hover svg { opacity: 1; transform: scale(1.1); }
-.loop-active svg { fill: var(--accent); opacity: 1; filter: drop-shadow(0 0 15px var(--accent)); }
+.buttons-row { display: flex; align-items: center; gap: 25px; }
+.ctrl-btn svg { width: 32px; height: 32px; fill: white; opacity: 0.7; cursor: pointer; }
 
 @media (max-width: 1400px) {
-    .dashboard-container { grid-template-columns: 1fr; height: auto; padding: 40px 0; }
+    .dashboard-container { grid-template-columns: 1fr; height: auto; padding: 20px 0; }
     .widgets-row { height: auto; flex-direction: column; }
     .time-display { font-size: 20vw; }
 }
@@ -202,7 +215,7 @@ body {
 
     <div class="glass-card music-section">
         <div id="playlist-selector">
-            <h2 style="font-size:36px; margin-bottom:20px; letter-spacing:-1px;">Select Media Source</h2>
+            <h2 style="font-size:24px; margin-bottom:10px; text-align:center;">Select Source</h2>
             <button class="playlist-btn" onclick="goFullscreenAndStart('PLZ2Dl3sR6J-T2JvZTrZ53Y4CDrqqT_eca')">Main Collection</button>
             <button class="playlist-btn" onclick="goFullscreenAndStart('PLZ2Dl3sR6J-Sr-8ygrY52eRWhgcurkufY')">Secondary Mix</button>
         </div>
