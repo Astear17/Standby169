@@ -37,7 +37,7 @@
             gap: 25px;
         }
 
-        /* --- GLOBAL GLASS EFFECT --- */
+        /* --- RESTORED OUTLINE STYLES --- */
         .glass-card, .glass-btn, .ctrl-btn, #playlist-selector {
             position: relative;
             background: var(--glass-bg);
@@ -75,9 +75,8 @@
         .activity-timer-container { display: flex; align-items: center; gap: 8px; margin-top: 5px; color: var(--accent); }
         .activity-timer { font-size: 20px; font-family: 'Source Code Pro', monospace; }
 
-        /* --- JUMPING/PROPORTIONAL CLOCK --- */
+        /* --- CLOCK REWORKED --- */
         .clock-widget { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; padding: 0 60px; }
-        
         .time-display { 
             display: flex;
             align-items: baseline;
@@ -85,25 +84,16 @@
             font-size: 12vw; 
             letter-spacing: -0.04em; 
             line-height: 1;
-            height: 1.1em;
+            height: 1.2em;
             overflow: hidden;
-            /* Proportional spacing enabled (tabular-nums removed) */
         }
-
         .digit-wrapper {
             position: relative;
-            width: auto; /* Shrinks to the width of the number */
+            width: auto;
             height: 100%;
             display: inline-block;
         }
-
-        /* We use a hidden template digit to "stretch" the wrapper to the correct width */
-        .digit-measure {
-            visibility: hidden;
-            pointer-events: none;
-            user-select: none;
-        }
-
+        .digit-measure { visibility: hidden; pointer-events: none; user-select: none; }
         .separator {
             padding: 0 0.02em;
             opacity: 0.7;
@@ -111,40 +101,30 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-
         .digit {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            text-align: center;
+            top: 0; left: 0; width: 100%; text-align: center;
             background: linear-gradient(180deg, #ffffff 0%, #aaaaaa 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             filter: drop-shadow(0 0 20px rgba(255,255,255,0.1));
+            will-change: transform, opacity, filter;
         }
 
+        /* Vanishing Animation */
         @keyframes slideInUp {
-            0% { transform: translateY(100%); filter: blur(15px); opacity: 0; }
+            0% { transform: translateY(80%); filter: blur(20px); opacity: 0; }
             100% { transform: translateY(0); filter: blur(0); opacity: 1; }
         }
-
         @keyframes slideOutUp {
             0% { transform: translateY(0); filter: blur(0); opacity: 1; }
-            100% { transform: translateY(-100%); filter: blur(15px); opacity: 0; }
+            100% { transform: translateY(-80%); filter: blur(20px); opacity: 0; }
         }
 
-        .digit.new { animation: slideInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        .digit.old { animation: slideOutUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .digit.new { animation: slideInUp 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards; z-index: 2; }
+        .digit.old { animation: slideOutUp 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards; z-index: 1; }
 
-        .date-display { 
-            font-weight: 500; 
-            font-size: 2vw; 
-            margin-top: 15px; 
-            margin-left: 10px;
-            color: var(--text-secondary); 
-            letter-spacing: 0.02em; 
-        }
+        .date-display { font-weight: 500; font-size: 2vw; margin-top: 15px; margin-left: 10px; color: var(--text-secondary); letter-spacing: 0.02em; }
 
         /* --- MUSIC SECTION --- */
         .music-section { padding: 25px; display: flex; flex-direction: column; }
@@ -158,11 +138,9 @@
         .controls-container { height: 160px; margin-top: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; z-index: 3; }
         .track-title { font-size: 18px; font-weight: 600; text-align: center; width: 90%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.7; }
         .buttons-row { display: flex; align-items: center; gap: 20px; }
-        .ctrl-btn { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
-        .ctrl-btn:active, .glass-btn:active { transform: scale(0.94); }
+        .ctrl-btn { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s; }
         .ctrl-btn svg { width: 24px; height: 24px; fill: white; opacity: 0.8; }
         .loop-active { border-color: var(--accent); }
-        .loop-active svg { fill: var(--accent); filter: drop-shadow(0 0 8px var(--accent)); }
     </style>
 </head>
 <body>
@@ -184,7 +162,7 @@
                         <div id="activityName" class="activity-title">Nothing ;-;</div>
                         <div id="activityState" class="activity-state"></div>
                         <div class="activity-timer-container" id="timerContainer" style="display:none;">
-                            <i class="fa-solid fa-gamepad gamepad-icon"></i>
+                            <i class="fa-solid fa-gamepad"></i>
                             <div id="activityTimer" class="activity-timer"></div>
                         </div>
                     </div>
@@ -201,7 +179,7 @@
                     <div class="digit-wrapper" id="s1"><span class="digit-measure">0</span></div>
                     <div class="digit-wrapper" id="s2"><span class="digit-measure">0</span></div>
                 </div>
-                <div class="date-display" id="date">GMT +07:00 • Monday, February 16, 2026</div>
+                <div class="date-display" id="date">Loading Date...</div>
             </div>
         </div>
 
@@ -234,33 +212,29 @@
     </div>
 
     <script>
-        let activityStart = null;
         const USER_ID = "1036621192515297322";
+        let activityStart = null;
 
         function updateDigit(id, newVal) {
             const container = document.getElementById(id);
             const currentVal = container.getAttribute('data-value');
             if (currentVal !== newVal) {
-                // Update the hidden measure so the container jumps to the new width immediately
                 container.querySelector('.digit-measure').innerText = newVal;
-                
                 const oldDigit = document.createElement('div');
                 oldDigit.className = 'digit old';
                 oldDigit.innerText = currentVal || '0';
-                
                 const newDigit = document.createElement('div');
                 newDigit.className = 'digit new';
                 newDigit.innerText = newVal;
                 
-                // Keep the measure span, remove old animated divs
                 const oldAnims = container.querySelectorAll('.digit');
-                oldAnims.forEach(el => el.remove());
+                oldAnims.forEach(el => { if(!el.classList.contains('old')) el.remove(); });
                 
                 container.appendChild(oldDigit);
                 container.appendChild(newDigit);
                 container.setAttribute('data-value', newVal);
                 
-                setTimeout(() => { if(oldDigit.parentNode) container.removeChild(oldDigit); }, 400);
+                setTimeout(() => { if(oldDigit.parentNode) oldDigit.remove(); }, 600);
             }
         }
 
@@ -275,15 +249,12 @@
                     document.getElementById('avatar').style.backgroundImage = `url(https://cdn.discordapp.com/avatars/${USER_ID}/${discord_user.avatar}.png)`;
                     const colors = { online: '#23a55a', idle: '#f0b232', dnd: '#f23f43', offline: '#80848e' };
                     document.getElementById('status').style.backgroundColor = colors[discord_status];
-                    
                     const game = activities.find(a => a.type === 0);
                     const custom = activities.find(a => a.type === 4);
-
                     if(custom) {
                         let emoji = custom.emoji?.id ? `<img src="https://cdn.discordapp.com/emojis/${custom.emoji.id}.png" style="width:20px;">` : "";
                         document.getElementById('customStatus').innerHTML = `${emoji} ${custom.state || ""}`;
                     }
-
                     if(game) {
                         document.getElementById('activityName').innerText = game.name;
                         document.getElementById('activityState').innerText = game.state || "";
@@ -308,14 +279,11 @@
             const h = now.getHours().toString().padStart(2, '0');
             const m = now.getMinutes().toString().padStart(2, '0');
             const s = now.getSeconds().toString().padStart(2, '0');
-
             updateDigit('h1', h[0]); updateDigit('h2', h[1]);
             updateDigit('m1', m[0]); updateDigit('m2', m[1]);
             updateDigit('s1', s[0]); updateDigit('s2', s[1]);
-            
             const dateStr = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
             document.getElementById('date').innerText = `GMT +07:00 • ${dateStr}`;
-
             if(activityStart) {
                 const diff = Math.floor((Date.now() - activityStart) / 1000);
                 const am = Math.floor(diff / 60); const as = diff % 60;
