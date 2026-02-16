@@ -37,7 +37,7 @@
             gap: 25px;
         }
 
-        /* --- GLOBAL GLASS EFFECT (Dual Corners) --- */
+        /* --- GLOBAL GLASS EFFECT --- */
         .glass-card, .glass-btn, .ctrl-btn, #playlist-selector {
             position: relative;
             background: var(--glass-bg);
@@ -46,7 +46,6 @@
             border: 1px solid var(--glass-border);
         }
 
-        /* Top-Left Bright Corner */
         .glass-card::before, .glass-btn::before, .ctrl-btn::before, #playlist-selector::before {
             content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 2px;
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.1) 45%, transparent 70%);
@@ -54,7 +53,6 @@
             -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; z-index: 2;
         }
 
-        /* Bottom-Right Bright Corner */
         .glass-card::after, .glass-btn::after, .ctrl-btn::after, #playlist-selector::after {
             content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 2px;
             background: linear-gradient(315deg, rgba(255, 255, 255, 0.64) 0%, rgba(255, 255, 255, 0.08) 45%, transparent 70%);
@@ -77,38 +75,43 @@
         .activity-timer-container { display: flex; align-items: center; gap: 8px; margin-top: 5px; color: var(--accent); }
         .activity-timer { font-size: 20px; font-family: 'Source Code Pro', monospace; }
 
-        .clock-widget { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; padding: 40px 60px; }
-        .time-display { font-weight: 800; font-size: clamp(90px, 12vw, 220px); letter-spacing: -0.035em; line-height: 0.88; background: linear-gradient(180deg, #ffffff 85%, #cfcfcf 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 8px 24px rgba(0,0,0,0.45)); }
-        .date-display { font-weight: 600; font-size: clamp(18px, 2.2vw, 36px); margin-top: 14px; color: var(--text-secondary); letter-spacing: 0.02em; }
+        /* --- CLOCK & DATE STYLE WITH HH:mm:ss Restored --- */
+        .clock-widget { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; padding: 0 60px; }
+        
+        .time-display { 
+            font-weight: 800; 
+            font-size: 12vw; /* Adjusted slightly to fit seconds */
+            letter-spacing: -0.04em; 
+            line-height: 0.9; 
+            background: linear-gradient(180deg, #ffffff 0%, #aaaaaa 100%); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            filter: drop-shadow(0 0 20px rgba(255,255,255,0.1));
+        }
+        
+        .date-display { 
+            font-weight: 500; 
+            font-size: 2vw; 
+            margin-top: 15px; 
+            margin-left: 10px;
+            color: var(--text-secondary); 
+            letter-spacing: 0.02em; 
+        }
 
         /* --- MUSIC SECTION --- */
         .music-section { padding: 25px; display: flex; flex-direction: column; }
-        
         #playlist-selector { 
             position: absolute; inset: 0; border-radius: 40px; border: none;
             background: rgba(0,0,0,0.95); z-index: 100; 
             display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 20px; padding: 40px; 
         }
-
-        .glass-btn { 
-            border-radius: 25px; color: white; width: 100%; cursor: pointer; 
-            font-size: 18px; font-weight: 700; padding: 24px; transition: transform 0.2s;
-        }
-
+        .glass-btn { border-radius: 25px; color: white; width: 100%; cursor: pointer; font-size: 18px; font-weight: 700; padding: 24px; transition: transform 0.2s;}
         .video-container { flex: 1; border-radius: 25px; overflow: hidden; background: #000; position: relative; z-index: 3; }
         .controls-container { height: 160px; margin-top: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; z-index: 3; }
         .track-title { font-size: 18px; font-weight: 600; text-align: center; width: 90%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.7; }
-        
         .buttons-row { display: flex; align-items: center; gap: 20px; }
-        
-        /* UNIFORM CIRCULAR BUTTONS */
-        .ctrl-btn { 
-            width: 60px; height: 60px; border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center; 
-            cursor: pointer; transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+        .ctrl-btn { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
         .ctrl-btn:active, .glass-btn:active { transform: scale(0.94); }
-
         .ctrl-btn svg { width: 24px; height: 24px; fill: white; opacity: 0.8; }
         .loop-active { border-color: var(--accent); }
         .loop-active svg { fill: var(--accent); filter: drop-shadow(0 0 8px var(--accent)); }
@@ -141,7 +144,7 @@
             </div>
             <div class="glass-card clock-widget">
                 <div class="time-display" id="clock">00:00:00</div>
-                <div class="date-display" id="date">GMT +07:00 - ...</div>
+                <div class="date-display" id="date">GMT +07:00 - Monday, February 16, 2026</div>
             </div>
         </div>
 
@@ -151,9 +154,7 @@
                 <button class="glass-btn" onclick="goFullscreenAndStart('PLZ2Dl3sR6J-T2JvZTrZ53Y4CDrqqT_eca')">Tuff Vietnamese remix playlist</button>
                 <button class="glass-btn" onclick="goFullscreenAndStart('PLZ2Dl3sR6J-Sr-8ygrY52eRWhgcurkufY')">Deepression7 Mix</button>
             </div>
-
             <div class="video-container"><div id="player"></div></div>
-
             <div class="controls-container">
                 <div class="track-title" id="trackTitle">Loading...</div>
                 <div class="buttons-row">
@@ -201,14 +202,11 @@
 
                     if(game) {
                         document.getElementById('activityName').innerText = game.name;
-                        // ADDED: Display game state (LV 54 | Asia)
                         document.getElementById('activityState').innerText = game.state || "";
                         document.getElementById('timerContainer').style.display = 'flex';
                         activityStart = game.timestamps?.start || null;
                         if(game.assets?.large_image) {
                             document.getElementById('activityIcon').style.display = 'block';
-                            // Note: For some apps, Lanyard provides full URLs in large_image, for others it's an ID.
-                            // This logic assumes it's an asset ID.
                             document.getElementById('activityIcon').style.backgroundImage = `url(https://cdn.discordapp.com/app-assets/${game.application_id}/${game.assets.large_image}.png)`;
                         }
                     } else {
@@ -223,9 +221,13 @@
 
         function updateVisuals() {
             const now = new Date();
+            // Restored HH:mm:ss format
             document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB', { hour12: false });
+            
+            // Updated to: GMT +07:00 • Monday, February 16, 2026
             const dateStr = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
-            document.getElementById('date').innerText = `GMT +07:00 - ${dateStr}`;
+            document.getElementById('date').innerText = `GMT +07:00 • ${dateStr}`;
+
             if(activityStart) {
                 const diff = Math.floor((Date.now() - activityStart) / 1000);
                 const m = Math.floor(diff / 60); const s = diff % 60;
