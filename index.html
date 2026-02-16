@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>iOS 26 Dashboard Standby</title>
+    <title>Standby169 - Standby Deck</title>
     <script src="https://www.youtube.com/iframe_api"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -147,15 +147,15 @@
 
         <div class="glass-card music-section">
             <div id="playlist-selector">
-                <h2 style="font-size:24px; margin-bottom:10px; font-weight:800; z-index:5;">Select Media</h2>
-                <button class="glass-btn" onclick="goFullscreenAndStart('PLZ2Dl3sR6J-T2JvZTrZ53Y4CDrqqT_eca')">Main Collection</button>
+                <h2 style="font-size:24px; margin-bottom:10px; font-weight:800; z-index:5;">Select Playlist</h2>
+                <button class="glass-btn" onclick="goFullscreenAndStart('PLZ2Dl3sR6J-T2JvZTrZ53Y4CDrqqT_eca')">._.</button>
                 <button class="glass-btn" onclick="goFullscreenAndStart('PLZ2Dl3sR6J-Sr-8ygrY52eRWhgcurkufY')">Secondary Mix</button>
             </div>
 
             <div class="video-container"><div id="player"></div></div>
 
             <div class="controls-container">
-                <div class="track-title" id="trackTitle">Standby...</div>
+                <div class="track-title" id="trackTitle">Loading...</div>
                 <div class="buttons-row">
                     <div class="ctrl-btn" id="loopBtn" onclick="toggleLoop()">
                         <svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
@@ -212,7 +212,7 @@
                             document.getElementById('activityIcon').style.backgroundImage = `url(https://cdn.discordapp.com/app-assets/${game.application_id}/${game.assets.large_image}.png)`;
                         }
                     } else {
-                        document.getElementById('activityName').innerText = "No activity";
+                        document.getElementById('activityName').innerText = "Nothing ;-;";
                         document.getElementById('activityState').innerText = "";
                         document.getElementById('activityIcon').style.display = 'none';
                         document.getElementById('timerContainer').style.display = 'none';
