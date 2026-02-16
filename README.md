@@ -56,7 +56,7 @@ Tìm dòng code sau trong thẻ `<script>` để thay thế bằng Discord User 
 ```
 const USER_ID = "YOUR_DISCORD_USER_ID";
 ```
-> Thay đổi YOUR_DISCORD_USER_ID này thành ID Discord của bạn
+> Thay đổi YOUR_DISCORD_USER_ID này thành [ID Discord](https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID#h_01HRSTXPS5H5D7JBY2QKKPVKNA) của bạn
 
 > Lưu ý: Bạn cần tham gia [server Discord của Lanyard](https://discord.gg/lanyard) để API hoạt động
 2. Thay đổi Playlist nhạc
