@@ -1,309 +1,264 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>iOS 26 Dashboard Standby</title>
-<script src="https://www.youtube.com/iframe_api"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iOS 26 Dashboard Standby</title>
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Source+Code+Pro:wght@600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --accent: #2aaea6;
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.5);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body {
+            background: #000000;
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            background-image: radial-gradient(circle at 20% 30%, rgba(124, 58, 237, 0.12) 0%, transparent 40%), 
+            radial-gradient(circle at 80% 70%, rgba(59, 130, 246, 0.12) 0%, transparent 40%);
+        }
+        .dashboard-container {
+            width: 96vw;
+            height: 92vh;
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 25px;
+        }
 
-<style>
-:root {
-    --glass-bg: rgba(255, 255, 255, 0.08);
-    --glass-border: rgba(255, 255, 255, 0.15);
-    --accent: #2aaea6;
-    --text-primary: #ffffff;
-    --text-secondary: rgba(255, 255, 255, 0.5);
-}
+        /* --- GLOBAL GLASS EFFECT (Dual Corners) --- */
+        .glass-card, .glass-btn, .ctrl-btn, #playlist-selector {
+            position: relative;
+            background: var(--glass-bg);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border: 1px solid var(--glass-border);
+        }
 
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        /* Top-Left Bright Corner */
+        .glass-card::before, .glass-btn::before, .ctrl-btn::before, #playlist-selector::before {
+            content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 2px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.1) 45%, transparent 70%);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; z-index: 2;
+        }
 
-body {
-    background: #000000;
-    color: var(--text-primary);
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    background-image: radial-gradient(circle at 20% 30%, rgba(124, 58, 237, 0.12) 0%, transparent 40%),
-                      radial-gradient(circle at 80% 70%, rgba(59, 130, 246, 0.12) 0%, transparent 40%);
-}
+        /* Bottom-Right Bright Corner */
+        .glass-card::after, .glass-btn::after, .ctrl-btn::after, #playlist-selector::after {
+            content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 2px;
+            background: linear-gradient(315deg, rgba(255, 255, 255, 0.64) 0%, rgba(255, 255, 255, 0.08) 45%, transparent 70%);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; z-index: 1;
+        }
 
-.dashboard-container {
-    width: 96vw;
-    height: 92vh;
-    display: grid;
-    grid-template-columns: 1fr 550px;
-    gap: 35px;
-}
+        .glass-card { border-radius: 40px; overflow: hidden; box-shadow: 0 30px 60px rgba(0,0,0,0.6); }
 
-/* --- LIQUID GLASS CARD --- */
-.glass-card {
-    background: var(--glass-bg);
-    backdrop-filter: blur(40px);
-    -webkit-backdrop-filter: blur(40px);
-    border: 1px solid var(--glass-border);
-    border-radius: 40px;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 30px 60px rgba(0,0,0,0.6);
-}
+        .left-section { display: flex; flex-direction: column; gap: 25px; height: 100%; }
+        .widgets-row { display: flex; gap: 25px; height: 25%; min-height: 140px; }
+        .profile-widget, .activity-widget { flex: 1; padding: 30px; display: flex; align-items: center; gap: 25px; }
+        .avatar { width: 90px; height: 90px; border-radius: 50%; background-size: cover; position: relative; z-index: 5; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .status-dot { width: 22px; height: 22px; border-radius: 50%; position: absolute; bottom: 5px; right: 5px; border: 4px solid #1a1a1a; }
+        .display-name { font-size: 32px; font-weight: 800; background: linear-gradient(to right,#2aaea6,#ffc490); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+        .activity-icon { width: 70px; height: 70px; border-radius: 15px; background-size: cover; background-position: center; flex-shrink: 0; display: none; }
+        .activity-label { opacity: 0.4; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; margin-bottom: 5px; }
+        .activity-title { font-size: 24px; font-weight: 800; line-height: 1.2; }
+        .activity-state { font-size: 14px; opacity: 0.7; margin-top: 2px; }
+        .activity-timer-container { display: flex; align-items: center; gap: 8px; margin-top: 5px; color: var(--accent); }
+        .activity-timer { font-size: 20px; font-family: 'Source Code Pro', monospace; }
 
-.glass-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 40px;
-    padding: 2px; 
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.1) 45%, transparent 70%);
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
-    z-index: 2;
-}
+        .clock-widget { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; padding: 40px 60px; }
+        .time-display { font-weight: 800; font-size: clamp(90px, 12vw, 220px); letter-spacing: -0.035em; line-height: 0.88; background: linear-gradient(180deg, #ffffff 85%, #cfcfcf 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 8px 24px rgba(0,0,0,0.45)); }
+        .date-display { font-weight: 600; font-size: clamp(18px, 2.2vw, 36px); margin-top: 14px; color: var(--text-secondary); letter-spacing: 0.02em; }
 
-.glass-card::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 40px;
-    padding: 2px;
-    background: linear-gradient(315deg, rgba(255, 255, 255, 0.64) 0%, rgba(255, 255, 255, 0.08) 45%, transparent 70%);
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
-    z-index: 1;
-}
+        /* --- MUSIC SECTION --- */
+        .music-section { padding: 25px; display: flex; flex-direction: column; }
+        
+        #playlist-selector { 
+            position: absolute; inset: 0; border-radius: 40px; border: none;
+            background: rgba(0,0,0,0.95); z-index: 100; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 20px; padding: 40px; 
+        }
 
-/* --- CLOCK (REFINED SIZE) --- */
-.clock-widget {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 0 60px;
-    min-height: 0; /* Prevents stretching */
-}
+        .glass-btn { 
+            border-radius: 25px; color: white; width: 100%; cursor: pointer; 
+            font-size: 18px; font-weight: 700; padding: 24px; transition: transform 0.2s;
+        }
 
-.time-display {
-    font-size: 11.5vw; /* Slightly smaller to prevent border overflow */
-    font-weight: 800;
-    line-height: 0.85;
-    letter-spacing: -0.05em;
-    background: linear-gradient(180deg, #ffffff 75%, #aaaaaa 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 20px rgba(255,255,255,0.1));
-    white-space: nowrap;
-}
+        .video-container { flex: 1; border-radius: 25px; overflow: hidden; background: #000; position: relative; z-index: 3; }
+        .controls-container { height: 160px; margin-top: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; z-index: 3; }
+        .track-title { font-size: 18px; font-weight: 600; text-align: center; width: 90%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.7; }
+        
+        .buttons-row { display: flex; align-items: center; gap: 20px; }
+        
+        /* UNIFORM CIRCULAR BUTTONS */
+        .ctrl-btn { 
+            width: 60px; height: 60px; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            cursor: pointer; transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .ctrl-btn:active, .glass-btn:active { transform: scale(0.94); }
 
-.date-display {
-    font-size: 1.8vw;
-    color: var(--text-secondary);
-    font-weight: 500;
-    margin-top: 15px;
-    margin-left: 5px;
-    letter-spacing: 0.01em;
-}
-
-/* --- PROFILE & ACTIVITY --- */
-.left-section { display: flex; flex-direction: column; gap: 35px; height: 100%; }
-.widgets-row { display: flex; gap: 35px; height: 260px; }
-.profile-widget, .activity-widget { flex: 1; padding: 45px; display: flex; align-items: center; gap: 35px; }
-.avatar { width: 130px; height: 130px; border-radius: 50%; background-size: cover; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 5; }
-.status-dot { width: 28px; height: 28px; border-radius: 50%; position: absolute; bottom: 8px; right: 8px; border: 5px solid #1a1a1a; }
-.display-name { font-size: 42px; font-weight: 800; margin-bottom: 5px; background: linear-gradient(to right,#2aaea6,#ffc490); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-.username { font-size: 22px; opacity: 0.5; font-weight: 600; }
-.custom-status { font-size: 22px; margin-top: 10px; display: flex; align-items: center; gap: 10px; color: #eee; font-weight: 400; }
-.custom-status img { width: 28px; height: 28px; }
-.activity-label { opacity: 0.4; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; font-weight: 800; }
-.activity-title { font-size: 32px; font-weight: 800; line-height: 1.2; }
-.activity-timer { font-size: 26px; color: var(--accent); margin-top: 10px; font-weight: 600; font-family: monospace; }
-
-/* --- MUSIC --- */
-.music-section { padding: 30px; display: flex; flex-direction: column; }
-#playlist-selector { position: absolute; inset: 0; background: rgba(0,0,0,0.98); z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 25px; padding: 50px; }
-.playlist-btn { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); padding: 25px; border-radius: 30px; color: white; width: 100%; cursor: pointer; font-size: 22px; font-weight: 700; transition: 0.3s; }
-.playlist-btn:hover { background: white; color: black; transform: scale(1.02); }
-.video-container { flex: 1; border-radius: 30px; overflow: hidden; background: #000; box-shadow: inset 0 0 50px rgba(0,0,0,1); position: relative; z-index: 3; }
-.controls-container { height: 180px; margin-top: 25px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 25px; z-index: 3; }
-.track-title { font-size: 22px; font-weight: 600; text-align: center; width: 95%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.9; }
-.buttons-row { display: flex; align-items: center; gap: 40px; }
-.ctrl-btn svg { width: 40px; height: 40px; fill: white; opacity: 0.7; cursor: pointer; transition: 0.2s; }
-.ctrl-btn:hover svg { opacity: 1; transform: scale(1.1); }
-.loop-active svg { fill: var(--accent); opacity: 1; filter: drop-shadow(0 0 15px var(--accent)); }
-
-@media (max-width: 1400px) {
-    .dashboard-container { grid-template-columns: 1fr; height: auto; padding: 40px 0; }
-    .widgets-row { height: auto; flex-direction: column; }
-    .time-display { font-size: 18vw; }
-}
-</style>
+        .ctrl-btn svg { width: 24px; height: 24px; fill: white; opacity: 0.8; }
+        .loop-active { border-color: var(--accent); }
+        .loop-active svg { fill: var(--accent); filter: drop-shadow(0 0 8px var(--accent)); }
+    </style>
 </head>
-
 <body>
-
-<div class="dashboard-container">
-    <div class="left-section">
-        <div class="widgets-row">
-            <div class="glass-card profile-widget">
-                <div class="avatar" id="avatar"><div class="status-dot" id="status"></div></div>
-                <div>
-                    <div class="display-name" id="displayName">Loading...</div>
-                    <div class="username" id="username"></div>
-                    <div id="customStatus" class="custom-status"></div>
+    <div class="dashboard-container">
+        <div class="left-section">
+            <div class="widgets-row">
+                <div class="glass-card profile-widget">
+                    <div class="avatar" id="avatar"><div class="status-dot" id="status"></div></div>
+                    <div>
+                        <div class="display-name" id="displayName">Loading...</div>
+                        <div class="username" id="username"></div>
+                        <div id="customStatus" style="font-size: 14px; margin-top:5px; display:flex; align-items:center; gap:5px;"></div>
+                    </div>
+                </div>
+                <div class="glass-card activity-widget">
+                    <div id="activityIcon" class="activity-icon"></div>
+                    <div style="width:100%">
+                        <p class="activity-label">Currently Playing</p>
+                        <div id="activityName" class="activity-title">Nothing ;-;</div>
+                        <div id="activityState" class="activity-state"></div>
+                        <div class="activity-timer-container" id="timerContainer" style="display:none;">
+                            <i class="fa-solid fa-gamepad gamepad-icon"></i>
+                            <div id="activityTimer" class="activity-timer"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            <div class="glass-card activity-widget">
-                <div style="width:100%">
-                    <p class="activity-label">Live Session</p>
-                    <div id="activityName" class="activity-title">No activity</div>
-                    <div id="activityTimer" class="activity-timer"></div>
-                </div>
+            <div class="glass-card clock-widget">
+                <div class="time-display" id="clock">00:00:00</div>
+                <div class="date-display" id="date">GMT +07:00 - ...</div>
             </div>
         </div>
 
-        <div class="glass-card clock-widget">
-            <div class="time-display" id="clock">00:00:00</div>
-            <div class="date-display" id="date">...</div>
+        <div class="glass-card music-section">
+            <div id="playlist-selector">
+                <h2 style="font-size:24px; margin-bottom:10px; font-weight:800; z-index:5;">Select Media</h2>
+                <button class="glass-btn" onclick="goFullscreenAndStart('PLZ2Dl3sR6J-T2JvZTrZ53Y4CDrqqT_eca')">Main Collection</button>
+                <button class="glass-btn" onclick="goFullscreenAndStart('PLZ2Dl3sR6J-Sr-8ygrY52eRWhgcurkufY')">Secondary Mix</button>
+            </div>
+
+            <div class="video-container"><div id="player"></div></div>
+
+            <div class="controls-container">
+                <div class="track-title" id="trackTitle">Standby...</div>
+                <div class="buttons-row">
+                    <div class="ctrl-btn" id="loopBtn" onclick="toggleLoop()">
+                        <svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
+                    </div>
+                    <div class="ctrl-btn" onclick="prevVideo()">
+                        <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+                    </div>
+                    <div class="ctrl-btn" onclick="togglePlay()">
+                        <svg id="p-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        <svg id="p-pause" viewBox="0 0 24 24" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                    </div>
+                    <div class="ctrl-btn" onclick="nextVideo()">
+                        <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="glass-card music-section">
-        <div id="playlist-selector">
-            <h2 style="font-size:36px; margin-bottom:20px; letter-spacing:-1px;">Select Media Source</h2>
-            <button class="playlist-btn" onclick="goFullscreenAndStart('PLZ2Dl3sR6J-T2JvZTrZ53Y4CDrqqT_eca')">Main Collection</button>
-            <button class="playlist-btn" onclick="goFullscreenAndStart('PLZ2Dl3sR6J-Sr-8ygrY52eRWhgcurkufY')">Secondary Mix</button>
-        </div>
-        <div class="video-container"><div id="player"></div></div>
-        <div class="controls-container">
-            <div class="track-title" id="trackTitle">Standby...</div>
-            <div class="buttons-row">
-                <div class="ctrl-btn" id="loopBtn" onclick="toggleLoop()"><svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg></div>
-                <div class="ctrl-btn" onclick="prevVideo()"><svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></div>
-                <div class="ctrl-btn" onclick="togglePlay()">
-                    <svg id="p-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                    <svg id="p-pause" viewBox="0 0 24 24" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-                </div>
-                <div class="ctrl-btn" onclick="nextVideo()"><svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg></div>
-            </div>
-        </div>
-    </div>
-</div>
+    <script>
+        let activityStart = null;
+        const USER_ID = "1036621192515297322";
 
-<script>
-function goFullscreenAndStart(id) {
-    const el = document.documentElement;
-    if (el.requestFullscreen) el.requestFullscreen();
-    else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-    startPlayer(id);
-}
+        function updateLanyard() {
+            fetch(`https://api.lanyard.rest/v1/users/${USER_ID}`)
+                .then(res => res.json())
+                .then(data => {
+                    if(!data.success) return;
+                    const { discord_user, activities, discord_status } = data.data;
+                    document.getElementById('displayName').innerText = discord_user.display_name;
+                    document.getElementById('username').innerText = `@${discord_user.username}`;
+                    document.getElementById('avatar').style.backgroundImage = `url(https://cdn.discordapp.com/avatars/${USER_ID}/${discord_user.avatar}.png)`;
+                    const colors = { online: '#23a55a', idle: '#f0b232', dnd: '#f23f43', offline: '#80848e' };
+                    document.getElementById('status').style.backgroundColor = colors[discord_status];
+                    
+                    const game = activities.find(a => a.type === 0);
+                    const custom = activities.find(a => a.type === 4);
 
-function updateClock(){
-    const now = new Date();
-    document.getElementById("clock").innerText = now.toLocaleTimeString('en-GB', {hour12:false});
-    document.getElementById("date").innerText = 
-        "GMT +07:00 - " + now.toLocaleDateString('en-US',{weekday:'long', year:'numeric', month:'long', day:'numeric'});
-}
-setInterval(updateClock, 1000);
-updateClock();
+                    if(custom) {
+                        let emoji = custom.emoji?.id ? `<img src="https://cdn.discordapp.com/emojis/${custom.emoji.id}.png" style="width:20px;">` : "";
+                        document.getElementById('customStatus').innerHTML = `${emoji} ${custom.state || ""}`;
+                    }
 
-/* --- Lanyard & Player logic remains identical --- */
-let currentActivityStart = null;
-function runTimer(){
-    if(!currentActivityStart) return;
-    const diff = Date.now() - currentActivityStart;
-    const sec = Math.floor(diff/1000);
-    const m = Math.floor(sec/60), s = sec%60;
-    document.getElementById("activityTimer").innerText = `${m}:${s.toString().padStart(2,'0')}`;
-    requestAnimationFrame(runTimer);
-}
+                    if(game) {
+                        document.getElementById('activityName').innerText = game.name;
+                        // ADDED: Display game state (LV 54 | Asia)
+                        document.getElementById('activityState').innerText = game.state || "";
+                        document.getElementById('timerContainer').style.display = 'flex';
+                        activityStart = game.timestamps?.start || null;
+                        if(game.assets?.large_image) {
+                            document.getElementById('activityIcon').style.display = 'block';
+                            // Note: For some apps, Lanyard provides full URLs in large_image, for others it's an ID.
+                            // This logic assumes it's an asset ID.
+                            document.getElementById('activityIcon').style.backgroundImage = `url(https://cdn.discordapp.com/app-assets/${game.application_id}/${game.assets.large_image}.png)`;
+                        }
+                    } else {
+                        document.getElementById('activityName').innerText = "No activity";
+                        document.getElementById('activityState').innerText = "";
+                        document.getElementById('activityIcon').style.display = 'none';
+                        document.getElementById('timerContainer').style.display = 'none';
+                        activityStart = null;
+                    }
+                });
+        }
 
-async function fetchDiscord(){
-    const res = await fetch("https://api.lanyard.rest/v1/users/1036621192515297322");
-    const json = await res.json();
-    const data = json.data;
-    if(!data) return;
-
-    const user = data.discord_user;
-    const format = user.avatar?.startsWith("a_") ? "gif":"webp";
-    document.getElementById("avatar").style.backgroundImage = `url('https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.${format}?size=256')`;
-    document.getElementById("displayName").innerText = user.display_name || user.username;
-    document.getElementById("username").innerText = "@" + user.username;
-
-    const colors = {online:"#43b581", idle:"#faa61a", dnd:"#f04747", offline:"#747f8d"};
-    document.getElementById("status").style.background = colors[data.discord_status] || "#747f8d";
-
-    const customDiv = document.getElementById("customStatus");
-    customDiv.innerHTML = "";
-    document.getElementById("activityName").innerText = "No activity";
-    document.getElementById("activityTimer").innerText = "";
-    currentActivityStart = null;
-
-    data.activities.forEach(act => {
-        if(act.type === 4) {
-            let emojiHtml = "";
-            if(act.emoji?.id) {
-                emojiHtml = `<img src="https://cdn.discordapp.com/emojis/${act.emoji.id}.png">`;
+        function updateVisuals() {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB', { hour12: false });
+            const dateStr = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+            document.getElementById('date').innerText = `GMT +07:00 - ${dateStr}`;
+            if(activityStart) {
+                const diff = Math.floor((Date.now() - activityStart) / 1000);
+                const m = Math.floor(diff / 60); const s = diff % 60;
+                document.getElementById('activityTimer').innerText = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
             }
-            customDiv.innerHTML = `${emojiHtml} <span>${act.state || ''}</span>`;
         }
-        if(act.type === 0 || act.name === "Spotify"){
-            document.getElementById("activityName").innerText = act.name;
-            if(act.timestamps?.start) { currentActivityStart = act.timestamps.start; runTimer(); }
+
+        setInterval(updateVisuals, 1000);
+        setInterval(updateLanyard, 15000);
+        updateLanyard(); updateVisuals();
+
+        let player, isLooping = false;
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', { height: '100%', width: '100%', playerVars: { 'autoplay': 0, 'controls': 0 }, events: { 'onStateChange': onPlayerStateChange } });
         }
-    });
-}
-fetchDiscord(); setInterval(fetchDiscord, 15000);
-
-let player, isLooping = false;
-function startPlayer(id) {
-    document.getElementById("playlist-selector").style.opacity = "0";
-    setTimeout(() => document.getElementById("playlist-selector").style.display = "none", 400);
-
-    if(!player) {
-        player = new YT.Player('player', {
-            height: '100%', width: '100%',
-            playerVars: { 'autoplay': 1, 'controls': 0, 'listType': 'playlist', 'list': id },
-            events: { 'onStateChange': onStateChange, 'onReady': (e) => { e.target.playVideo(); updateTitle(); } }
-        });
-    } else {
-        player.loadPlaylist({list: id});
-    }
-}
-
-function onStateChange(e) {
-    if(e.data == 1) { 
-        document.getElementById("p-play").style.display="none"; 
-        document.getElementById("p-pause").style.display="block"; 
-    } else { 
-        document.getElementById("p-play").style.display="block"; 
-        document.getElementById("p-pause").style.display="none"; 
-    }
-    if(e.data == 0 && isLooping) player.playVideoAt(0);
-}
-
-function updateTitle() {
-    if(player && player.getVideoData) {
-        const t = player.getVideoData().title;
-        if(t) document.getElementById("trackTitle").innerText = t;
-    }
-}
-setInterval(updateTitle, 2000);
-
-function togglePlay() { player.getPlayerState() === 1 ? player.pauseVideo() : player.playVideo(); }
-function nextVideo() { player.nextVideo(); }
-function prevVideo() { player.previousVideo(); }
-function toggleLoop() { 
-    isLooping = !isLooping; 
-    document.getElementById("loopBtn").classList.toggle("loop-active", isLooping);
-}
-</script>
+        function goFullscreenAndStart(pid) {
+            document.getElementById('playlist-selector').style.display = 'none';
+            player.loadPlaylist({ list: pid, listType: 'playlist' });
+            if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
+        }
+        function onPlayerStateChange(e) {
+            if (e.data == 1) {
+                document.getElementById('trackTitle').innerText = player.getVideoData().title;
+                document.getElementById('p-play').style.display = 'none'; document.getElementById('p-pause').style.display = 'block';
+            } else {
+                document.getElementById('p-play').style.display = 'block'; document.getElementById('p-pause').style.display = 'none';
+            }
+            if (e.data == 0 && isLooping) player.playVideo();
+        }
+        function togglePlay() { player.getPlayerState() === 1 ? player.pauseVideo() : player.playVideo(); }
+        function nextVideo() { player.nextVideo(); }
+        function prevVideo() { player.previousVideo(); }
+        function toggleLoop() { isLooping = !isLooping; document.getElementById('loopBtn').classList.toggle('loop-active'); }
+    </script>
 </body>
 </html>
